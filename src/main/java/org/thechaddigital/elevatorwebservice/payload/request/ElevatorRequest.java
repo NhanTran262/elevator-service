@@ -1,4 +1,4 @@
-package org.thechaddigital.elevatorwebservice.dto;
+package org.thechaddigital.elevatorwebservice.payload.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import org.thechaddigital.elevatorwebservice.constant.RequestType;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ElevatorRequestDto {
+public class ElevatorRequest {
     Long elevatorId;
     Integer targetFloor;
     Boolean direction;

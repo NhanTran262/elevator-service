@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.thechaddigital.elevatorwebservice.dto.ElevatorDto;
-import org.thechaddigital.elevatorwebservice.dto.ElevatorRequestDto;
+import org.thechaddigital.elevatorwebservice.payload.request.ElevatorRequest;
 import org.thechaddigital.elevatorwebservice.payload.response.ElevatorResponse;
 import org.thechaddigital.elevatorwebservice.service.ElevatorService;
 
@@ -29,13 +29,13 @@ public class ElevatorController {
     }
 
     @PostMapping("/call")
-    public ResponseEntity<ElevatorResponse> callElevator(@RequestBody ElevatorRequestDto elevatorRequestDto) {
-        ElevatorResponse elevatorResponse = elevatorService.callElevator(elevatorRequestDto);
+    public ResponseEntity<ElevatorResponse> callElevator(@RequestBody ElevatorRequest elevatorRequest) {
+        ElevatorResponse elevatorResponse = elevatorService.callElevator(elevatorRequest);
         return ResponseEntity.ok(elevatorResponse);
     }
     @PostMapping("/select")
-    public ResponseEntity<ElevatorResponse> selectFloor(@RequestBody ElevatorRequestDto elevatorRequestDto) {
-        ElevatorResponse elevatorResponse = elevatorService.selectFloor(elevatorRequestDto);
+    public ResponseEntity<ElevatorResponse> selectFloor(@RequestBody ElevatorRequest elevatorRequest) {
+        ElevatorResponse elevatorResponse = elevatorService.selectFloor(elevatorRequest);
         return ResponseEntity.ok(elevatorResponse);
     }
     

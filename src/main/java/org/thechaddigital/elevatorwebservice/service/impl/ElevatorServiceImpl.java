@@ -9,13 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.thechaddigital.elevatorwebservice.constant.RequestType;
 import org.thechaddigital.elevatorwebservice.dto.ElevatorDto;
-import org.thechaddigital.elevatorwebservice.dto.ElevatorRequestDto;
+import org.thechaddigital.elevatorwebservice.payload.request.ElevatorRequest;
 import org.thechaddigital.elevatorwebservice.entity.Elevator;
-import org.thechaddigital.elevatorwebservice.entity.ElevatorRequest;
-import org.thechaddigital.elevatorwebservice.mapper.ElevatorRequestMapper;
 import org.thechaddigital.elevatorwebservice.payload.response.ElevatorResponse;
 import org.thechaddigital.elevatorwebservice.repository.ElevatorRepository;
-import org.thechaddigital.elevatorwebservice.repository.ElevatorRequestRepository;
 import org.thechaddigital.elevatorwebservice.service.ElevatorService;
 
 import java.util.Comparator;
@@ -29,8 +26,6 @@ import java.util.concurrent.ScheduledExecutorService;
 @RequiredArgsConstructor
 public class ElevatorServiceImpl implements ElevatorService {
     private final ElevatorRepository elevatorRepository;
-    private final ElevatorRequestRepository elevatorRequestRepository;
-    private final ElevatorRequestMapper elevatorRequestMapper;
     private final BlockingDeque<ElevatorRequest> requestQueue = new LinkedBlockingDeque<>();
     private final ScheduledExecutorService[] scheduledExecutorServices = {
             Executors.newSingleThreadScheduledExecutor(),
@@ -57,12 +52,9 @@ public class ElevatorServiceImpl implements ElevatorService {
     }
 
     @Override
-    public ElevatorResponse callElevator(ElevatorRequestDto elevatorRequestDto) {
+    public ElevatorResponse callElevator(ElevatorRequest elevatorRequest) {
         LOGGER.info("ElevatorServiceImpl -> Call Elevator Invoked.");
         try {
-            ElevatorRequest elevatorRequest = new ElevatorRequest();
-            BeanUtils.copyProperties(elevatorRequestDto, elevatorRequest);
-            elevatorRequestRepository.save(elevatorRequest);
             requestQueue.offer(elevatorRequest);
             startProcessQueue();
             List<Elevator> elevators = elevatorRepository.findAll();
@@ -78,18 +70,17 @@ public class ElevatorServiceImpl implements ElevatorService {
     }
 
     @Override
-    public ElevatorResponse selectFloor(ElevatorRequestDto elevatorRequestDto) {
+    public ElevatorResponse selectFloor(ElevatorRequest elevatorRequest) {
         LOGGER.info("ElevatorServiceImpl -> Select Floor Invoked.");
         try {
-            Elevator elevator = elevatorRepository.findById(elevatorRequestDto.getElevatorId())
+            Elevator elevator = elevatorRepository.findById(elevatorRequest.getElevatorId())
                     .orElseThrow(() -> new IllegalArgumentException("Elevator not found"));
-            ElevatorRequest elevatorRequest = elevatorRequestMapper.dtoToEntity(elevator, elevatorRequestDto);
-            elevator.setElevatorRequest(elevatorRequest);
-            elevatorRequestRepository.save(elevatorRequest);
-            moveElevator(elevator);
+            elevator.setCurrentFloor(elevatorRequest.getTargetFloor());
+            elevator.setIsMovingUp(elevatorRequest.getDirection());
+            elevatorRepository.save(elevator);
             return ElevatorResponse.builder()
                     .id(elevator.getId())
-                    .targetFloor(elevatorRequestDto.getTargetFloor())
+                    .targetFloor(elevatorRequest.getTargetFloor())
                     .build();
         } catch (Exception e) {
             LOGGER.error("ElevatorServiceImpl -> Select Floor Error: {}.", e.getMessage());
@@ -108,10 +99,7 @@ public class ElevatorServiceImpl implements ElevatorService {
                         Elevator nearestElevator = findNearestElevator(elevators, request);
                         if (nearestElevator != null) {
                             synchronized (nearestElevator) {
-                                request.setElevator(nearestElevator);
                                 request.setStatus(true);
-                                nearestElevator.setElevatorRequest(request);
-                                elevatorRequestRepository.save(request);
                                 elevatorRepository.save(nearestElevator);
                                 scheduledExecutorService.submit(() -> moveElevator(nearestElevator));
                             }
@@ -144,21 +132,5 @@ public class ElevatorServiceImpl implements ElevatorService {
                 .orElse(null);
     }
 
-    private void moveElevator(Elevator elevator) {
-        LOGGER.info("ElevatorServiceImpl -> Move Elevator Invoked.");
-        try {
-            ElevatorRequest elevatorRequest = elevator.getElevatorRequest();
-            System.out.println(Thread.currentThread().getName() + ": Moving Elevator Request: " + elevatorRequest);
-            elevator.setCurrentFloor(elevatorRequest.getTargetFloor());
-            elevator.setIsMovingUp(elevatorRequest.getDirection());
-            elevator.setElevatorRequest(null);
-            elevatorRepository.save(elevator);
-            elevatorRequest.setElevator(null);
-            elevatorRequestRepository.save(elevatorRequest);
-            elevatorRequestRepository.delete(elevatorRequest);
-        } catch (Exception e) {
-            LOGGER.error("ElevatorServiceImpl -> Move Elevator Error: {}.", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-    }
+
 }
