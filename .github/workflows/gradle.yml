@@ -106,9 +106,9 @@ jobs:
       - name: Check and re-tag existing image
         id: check_image
         run: |
-          if docker manifest inspect ${{ secrets.DOCKER_HUB_USERNAME }}/testcicd:BE-latest > /dev/null 2>&1; then
+          if docker manifest inspect ${{ secrets.DOCKER_HUB_USERNAME }}/elevator:BE-latest > /dev/null 2>&1; then
             CURRENT_VERSION=$(curl -s 
-            "https://registry.hub.docker.com/v2/repositories/${{ secrets.DOCKER_HUB_USERNAME }}/testcicd/tags?page_size=100" 
+            "https://registry.hub.docker.com/v2/repositories/${{ secrets.DOCKER_HUB_USERNAME }}/elevator/tags?page_size=100" 
             | jq -r '.results[] 
             | select(.name | startswith("BE-v")) | .name' | sort -V | tail -n 1)
             if [ -z "$CURRENT_VERSION" ]; then
@@ -120,9 +120,9 @@ jobs:
             fi
             echo "Current version: $CURRENT_VERSION"
             echo "New version: $NEW_VERSION"
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/testcicd:BE-latest
-            docker tag  ${{ secrets.DOCKER_HUB_USERNAME }}/testcicd:BE-latest ${{ secrets.DOCKER_HUB_USERNAME }}/testcicd:$NEW_VERSION
-            docker push ${{ secrets.DOCKER_HUB_USERNAME }}/testcicd:$NEW_VERSION
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/elevator:BE-latest
+            docker tag  ${{ secrets.DOCKER_HUB_USERNAME }}/elevator:BE-latest ${{ secrets.DOCKER_HUB_USERNAME }}/elevator:$NEW_VERSION
+            docker push ${{ secrets.DOCKER_HUB_USERNAME }}/elevator:$NEW_VERSION
           fi
 
       - name: Build and Push to Docker Hub
@@ -130,7 +130,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/testcicd:BE-latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/elevator:BE-latest
 
   deploy:
     name: Deploy to Ubuntu server
@@ -145,7 +145,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            cd /con-rua-bien
+            cd /elevator
             cp compose.yaml compose.yaml.bak
             sed -i "s/MYSQL_HOST=.*/MYSQL_HOST=${{ secrets.MYSQL_HOST }}/" compose.yaml
             sed -i "s/MYSQL_USER=.*/MYSQL_USER=${{ secrets.MYSQL_USER }}/" compose.yaml
