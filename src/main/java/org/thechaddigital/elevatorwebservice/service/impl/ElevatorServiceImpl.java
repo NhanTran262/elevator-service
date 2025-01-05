@@ -82,8 +82,8 @@ public class ElevatorServiceImpl implements ElevatorService {
 
     private Elevator findNearestElevator(List<Elevator> elevators, ElevatorRequest elevatorRequest) {
         return elevators.stream()
-                .filter(elevator -> (elevator.getIsMovingUp() && elevator.getCurrentFloor() >= elevatorRequest.getTargetFloor())
-                        || (!elevator.getIsMovingUp() && elevator.getCurrentFloor() <= elevatorRequest.getTargetFloor())
+                .filter(elevator -> (elevator.getIsMovingUp() && elevator.getCurrentFloor() <= elevatorRequest.getTargetFloor())
+                        || (!elevator.getIsMovingUp() && elevator.getCurrentFloor() >= elevatorRequest.getTargetFloor())
                         || !elevator.getIsMovingUp())
                 .min(Comparator.comparingInt(elevator -> Math.abs(elevator.getCurrentFloor() - elevatorRequest.getTargetFloor())))
                 .orElse(null);
