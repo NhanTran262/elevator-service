@@ -2,7 +2,7 @@ FROM gradle:8.6-jdk17 AS build
 
 WORKDIR /app
 
-COPY path/to/build.gradle path/to/settings.gradle ./
+COPY build.gradle.kts settings.gradle.kts ./
 
 COPY src ./src
 
