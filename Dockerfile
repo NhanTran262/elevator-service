@@ -2,7 +2,7 @@ FROM gradle:8.6-jdk17 AS build
 
 WORKDIR /app
 
-COPY build.gradle settings.gradle ./
+COPY path/to/build.gradle path/to/settings.gradle ./
 
 COPY src ./src
 
@@ -12,6 +12,6 @@ FROM openjdk:17-jdk-oracle
 
 WORKDIR /app
 
-COPY --from=build /app/build/libs/*.jar elevator-service-0.0.1-SNAPSHOT.jar
+COPY --from=build /app/build/libs/*.jar elevator-web-service-0.0.1-SNAPSHOT.jar
 
-ENTRYPOINT ["java", "-jar", "elevator-service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "elevator-web-service-0.0.1-SNAPSHOT.jar"]
