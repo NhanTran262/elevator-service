@@ -9,21 +9,11 @@ CREATE TABLE IF NOT EXISTS `elevators`
 );
 CREATE TABLE IF NOT EXISTS `floors`
 (
-    `id`    BIGINT AUTO_INCREMENT,
+    `id`           BIGINT AUTO_INCREMENT,
     `floor_number` VARCHAR(10),
     CONSTRAINT floor_pk PRIMARY KEY (`id`)
 );
-CREATE TABLE IF NOT EXISTS `elevator_requests`
-(
-    `id`           BIGINT AUTO_INCREMENT,
-    `elevator_id`  BIGINT,
-    `target_floor` INT,
-    `direction`    BIT(1) DEFAULT 1,
-    `type`         ENUM ('CALL','OPEN_DOOR', 'CLOSE_DOOR','SELECT'),
-    `status`       BIT(1) DEFAULT 1,
-    CONSTRAINT elevator_request_pk PRIMARY KEY (`id`),
-    CONSTRAINT elevator_request_elevator_fk FOREIGN KEY (`elevator_id`) REFERENCES elevators (`id`)
-);
+
 INSERT INTO `elevators` (`name`)
 VALUES ('Elevator 1'),
        ('Elevator 2'),

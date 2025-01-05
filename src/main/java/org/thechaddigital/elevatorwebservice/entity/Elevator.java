@@ -35,8 +35,7 @@ public class Elevator {
     Boolean isMovingUp;
     @JoinColumn(name = "is_door_open")
     Boolean isDoorOpen;
-    @OneToOne(mappedBy = "elevator")
-    ElevatorRequest elevatorRequest;
+
 
 
 }
