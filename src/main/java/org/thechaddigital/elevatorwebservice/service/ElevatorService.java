@@ -2,17 +2,15 @@ package org.thechaddigital.elevatorwebservice.service;
 
 import org.thechaddigital.elevatorwebservice.dto.ElevatorDto;
 import org.thechaddigital.elevatorwebservice.dto.ElevatorRequestDto;
+import org.thechaddigital.elevatorwebservice.payload.response.ElevatorResponse;
 
 import java.util.List;
 
 public interface ElevatorService {
     List<ElevatorDto> getAllElevators();
 
-    void callElevator(ElevatorRequestDto elevatorRequestDto);
+    ElevatorResponse callElevator(ElevatorRequestDto elevatorRequestDto);
 
-    void selectFloor(Long elevatorId, Integer floor);
+    ElevatorResponse selectFloor(ElevatorRequestDto elevatorRequestDto);
 
-    void openElevator(Long elevatorId);
-
-    void closeElevator(Long elevatorId);
 }
