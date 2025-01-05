@@ -89,6 +89,7 @@ jobs:
           MYSQL_DB: ${{ secrets.MYSQL_DB }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          DOMAIN: ${{secrets.DOMAIN}}
         run: ./gradlew build
 
       - name: Set up QEMU
@@ -151,6 +152,7 @@ jobs:
             sed -i "s/MYSQL_USER=.*/MYSQL_USER=${{ secrets.MYSQL_USER }}/" compose.yaml
             sed -i "s/MYSQL_PASSWORD=.*/MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}/" compose.yaml
             sed -i "s/MYSQL_DB=.*/MYSQL_DB=${{ secrets.MYSQL_DB }}/" compose.yaml
+            sed -i "s/DOMAIN=.*/DOMAIN=${{ secrets.DOMAIN }}/" compose.yaml
             docker compose pull
             docker compose down
             docker compose up -d
